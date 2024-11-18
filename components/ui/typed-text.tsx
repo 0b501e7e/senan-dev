@@ -6,15 +6,32 @@ interface TypedTextProps {
   text: string
   className?: string
   speed?: number
+  delay?: number
+  onComplete?: () => void
 }
 
-export function TypedText({ text, className, speed = 100 }: TypedTextProps) {
+export function TypedText({ 
+  text, 
+  className, 
+  speed = 100,
+  delay = 0,
+  onComplete 
+}: TypedTextProps) {
   const [displayedText, setDisplayedText] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   const [showCursor, setShowCursor] = useState(true)
+  const [shouldStart, setShouldStart] = useState(false)
+
+  // Handle initial delay
+  useEffect(() => {
+    const timer = setTimeout(() => setShouldStart(true), delay)
+    return () => clearTimeout(timer)
+  }, [delay])
 
   // Typing effect
   useEffect(() => {
+    if (!shouldStart) return
+
     if (currentIndex < text.length) {
       const timeout = setTimeout(() => {
         setDisplayedText(prev => prev + text[currentIndex])
@@ -22,14 +39,16 @@ export function TypedText({ text, className, speed = 100 }: TypedTextProps) {
       }, speed)
 
       return () => clearTimeout(timeout)
+    } else if (onComplete) {
+      onComplete()
     }
-  }, [currentIndex, text, speed])
+  }, [currentIndex, text, speed, shouldStart, onComplete])
 
   // Cursor blink effect
   useEffect(() => {
     const blinkInterval = setInterval(() => {
       setShowCursor(prev => !prev)
-    }, 530) // Standard terminal cursor blink rate
+    }, 530)
 
     return () => clearInterval(blinkInterval)
   }, [])
