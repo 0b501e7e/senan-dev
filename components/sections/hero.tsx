@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, type JSX } from 'react'
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { siGithub, siLinkedin, siX, siMaildotru } from "simple-icons"
