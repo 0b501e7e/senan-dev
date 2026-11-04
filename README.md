@@ -1,5 +1,37 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Security maintenance (November 2026)
+
+The existing Next.js site uses Next.js 15.5.29 and stable React/React DOM 19.3.1.
+Keep `eslint-config-next` aligned with Next.js and use the committed lockfile with
+`npm ci` for reproducible installs.
+
+Next.js 15 pins an older PostCSS release. The scoped `overrides.next.postcss`
+entry uses the project's patched PostCSS 8 dependency until the framework's
+pinned dependency is updated. Do not remove it without running the audit again.
+
+Validation commands:
+
+```bash
+npm ci
+npm run build
+npm audit --omit=dev
+npm audit
+```
+
+At the time of this patch, the production audit reports zero vulnerabilities.
+The full audit reports 18 moderate entries, all propagated from
+[GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)
+in the ESLint development dependency tree. The npm report currently marks
+`minimatch <11.0.1`, while the upstream advisory lists `>=7.0.0 <11.0.1`.
+The installed tooling includes both 3.x and 9.x. An indiscriminate override to
+11.x would break tools expecting the 3.x callable export; the audit's suggested
+ESLint downgrades are also unsuitable. Keep this finding visible and revisit
+compatible upstream fixes. No audit exclusions have been added.
+
+The patch must be deployed before it protects the public website. It does not
+update the separate, unfinished Astro redesign.
+
 ## Getting Started
 
 First, run the development server:
